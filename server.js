@@ -59,6 +59,7 @@ app.post("/api/guest", (req, res) => {
 
 // 🚀 Start server
 const PORT = 7000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(7000, '0.0.0.0', () => {
+  console.log("🚀 Server running on port 7000");
 });
+
