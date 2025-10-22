@@ -19,7 +19,7 @@ db.connect((err) => {
   if (err) {
     console.error("❌ Database connection failed:", err);
   } else {
-    console.log("✅Database has Connected to MySQL database");
+    console.log("✅Database has been Connected to MySQL database");
   }
 });
 
