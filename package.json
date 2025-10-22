@@ -45,5 +45,13 @@
   "main": "index.js",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lktec-io/wedding-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lktec-io/wedding-backend/issues"
+  },
+  "homepage": "https://github.com/lktec-io/wedding-backend#readme"
 }

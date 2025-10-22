@@ -1,55 +1,64 @@
 import express from "express";
-import mysql from "mysql2/promise";
-import { v4 as uuidv4 } from "uuid";
+import mysql from "mysql2";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { v4 as uuidv4 } from "uuid";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MySQL connection
-const db = await mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+// 🧩 Connect to MySQL
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "Leonard1234#1234",
+  database: "wedding",
 });
 
-// Endpoint: Add guest
-app.post("/api/guest", async (req, res) => {
-  const { name, email, phone } = req.body;
+db.connect((err) => {
+  if (err) {
+    console.error("❌ Database connection failed:", err);
+  } else {
+    console.log("✅Database has been Connected to MySQL database");
+  }
+});
+
+// 🧾 API route: Get all guests
+app.get("/api/guest", (req, res) => {
+  db.query("SELECT * FROM guests", (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
+});
+
+// 🧾 API route: Get one guest by UUID
+app.get("/api/guest/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  db.query("SELECT * FROM guests WHERE uuid = ?", [uuid], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    if (results.length === 0)
+      return res.status(404).json({ message: "Guest not found" });
+    res.json(results[0]);
+  });
+});
+
+// 🧩 API route: Add new guest (optional for now)
+app.post("/api/guest", (req, res) => {
+  const { name } = req.body;
   const uuid = uuidv4();
 
-  try {
-    await db.query(
-      "INSERT INTO guests (uuid, name, email, phone) VALUES (?, ?, ?, ?)",
-      [uuid, name, email || "", phone || ""]
-    );
-    res.json({ uuid, name });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
+  db.query(
+    "INSERT INTO guests (uuid, name) VALUES (?, ?)",
+    [uuid, name],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: "Guest added successfully", uuid });
+    }
+  );
 });
 
-// Endpoint: Get guest by UUID
-app.get("/api/guest/:uuid", async (req, res) => {
-  const { uuid } = req.params;
-
-  try {
-    const [rows] = await db.query("SELECT * FROM guests WHERE uuid = ?", [uuid]);
-    if (rows.length === 0) return res.status(404).json({ error: "Hakuna mgeni" });
-    res.json(rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// Start server
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+// 🚀 Start server
+const PORT = 7000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
