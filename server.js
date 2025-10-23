@@ -8,12 +8,14 @@ app.use(cors());
 app.use(express.json());
 
 // 🧩 Connect to MySQL
-const db = mysql.createConnection({
+const db = mysql.createPool({
+  connectionLimit: 10,
   host: "127.0.0.1",
   user: "root",
   password: "Leonard1234#1234",
   database: "wedding",
 });
+
 
 db.connect((err) => {
   if (err) {
@@ -41,22 +43,19 @@ app.get("/api/guest/:uuid", (req, res) => {
 
   db.query("SELECT * FROM guests WHERE uuid = ?", [uuid], (err, results) => {
     if (err) {
-      console.error("❌ MySQL error:", err.message);
-      return res.status(500).json({ error: "Database query failed" });
+      console.error("❌ MySQL error details:", err);
+      return res.status(500).json({ error: err.message || "Database query failed" });
     }
 
-    console.log("📦 Query results:", results);
-
-    // Hakikisha results ipo na siyo tupu
     if (!results || results.length === 0) {
       console.log("⚠️ Guest not found for UUID:", uuid);
       return res.status(404).json({ message: "Guest not found" });
     }
 
-    // ✅ Rudisha guest mmoja tu
     res.status(200).json(results[0]);
   });
 });
+
 
 // ✅ API: Add new guest
 app.post("/api/guest", (req, res) => {
