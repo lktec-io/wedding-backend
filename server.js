@@ -34,20 +34,25 @@ app.get("/api/guest", (req, res) => {
 // 🧾 API route: Get one guest by UUID
 app.get("/api/guest/:uuid", (req, res) => {
   const { uuid } = req.params;
-  console.log("🔍 Received UUID:", uuid);
+  console.log("🔍 Guest requested:", uuid);
 
   db.query("SELECT * FROM guests WHERE uuid = ?", [uuid], (err, results) => {
     if (err) {
-      console.error("❌ Database error:", err);
-      return res.status(500).json({ error: "Database query failed" });
+      console.error("❌ MySQL error:", err);
+      return res.status(500).json({ error: "Database query failed", details: err });
     }
-    if (results.length === 0) {
-      console.warn("⚠️ Guest not found for UUID:", uuid);
+
+    console.log("📦 Query results:", results);
+
+    if (!results || results.length === 0) {
+      console.log("⚠️ Guest not found");
       return res.status(404).json({ message: "Guest not found" });
     }
+
     res.json(results[0]);
   });
 });
+
 
 
 // 🧩 API route: Add new guest (optional for now)
