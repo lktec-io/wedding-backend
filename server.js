@@ -10,7 +10,7 @@ app.use(express.json());
 // 🧩 Connect to MySQL
 const db = mysql.createPool({
   connectionLimit: 10,
-  host: "127.0.0.1",
+  host: "localhost",
   user: "root",
   password: "Leonard1234#1234",
   database: "wedding",
