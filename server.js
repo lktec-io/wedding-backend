@@ -9,21 +9,16 @@ app.use(express.json());
 
 // 🧩 Connect to MySQL
 const db = mysql.createPool({
-  connectionLimit: 10,
-  host: "localhost",
+  host: "127.0.0.1",
   user: "root",
   password: "Leonard1234#1234",
   database: "wedding",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-
-db.connect((err) => {
-  if (err) {
-    console.error("❌ Database connection failed:", err.message);
-  } else {
-    console.log("✅ Connected to MySQL database");
-  }
-});
+console.log("✅ Connected to MySQL database (using connection pool)");
 
 // ✅ API: Get all guests
 app.get("/api/guest", (req, res) => {
