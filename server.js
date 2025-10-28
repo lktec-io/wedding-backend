@@ -32,6 +32,7 @@ function generateCode(length = 6) {
 // ✅ API: Get guest details by UUID
 app.get("/api/guest/:uuid", (req, res) => {
   const { uuid } = req.params;
+   console.log("🔍 Received UUID:", uuid); // Add this line
 
   db.query("SELECT * FROM guests WHERE uuid = ?", [uuid], (err, results) => {
     if (err) {
