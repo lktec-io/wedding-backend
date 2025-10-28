@@ -29,6 +29,24 @@ function generateCode(length = 6) {
   }
   return code;
 }
+// ✅ API: Get guest details by UUID
+app.get("/api/guest/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  db.query("SELECT * FROM guests WHERE uuid = ?", [uuid], (err, results) => {
+    if (err) {
+      console.error("❌ Error fetching guest:", err.message);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    if (results.length === 0) {
+      console.log("⚠️ Guest not found:", uuid);
+      return res.status(404).json({ error: "Guest not found" });
+    }
+
+    res.json(results[0]);
+  });
+});
 
 // ✅ API: Add new guest
 app.post("/api/guest", (req, res) => {
@@ -52,24 +70,6 @@ app.post("/api/guest", (req, res) => {
 });
 
 
-// ✅ API: Get guest details by UUID
-app.get("/api/guest/:uuid", (req, res) => {
-  const { uuid } = req.params;
-
-  db.query("SELECT * FROM guests WHERE uuid = ?", [uuid], (err, results) => {
-    if (err) {
-      console.error("❌ Error fetching guest:", err.message);
-      return res.status(500).json({ error: "Database error" });
-    }
-
-    if (results.length === 0) {
-      console.log("⚠️ Guest not found:", uuid);
-      return res.status(404).json({ error: "Guest not found" });
-    }
-
-    res.json(results[0]);
-  });
-});
 
 // ✅ API: Verify guest (QR code or manual code)
 app.post("/api/verify", (req, res) => {
