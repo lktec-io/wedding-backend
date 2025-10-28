@@ -44,7 +44,6 @@ app.get("/api/guest/:uuid", (req, res) => {
       console.log("⚠️ Guest not found:", uuid);
       return res.status(404).json({ error: "Guest not found" });
     }
-
     res.json(results[0]);
   });
 });
@@ -57,9 +56,10 @@ app.post("/api/guest", (req, res) => {
   const uuid = uuidv4();
   const verifyCode = hasSmartphone ? null : generateCode(6); // kwa wasiokuwa na smartphone
 
-  db.query(
-    "INSERT INTO guests (uuid, name, email, phone, type, verify_code, checked_in) VALUES (?, ?, ?, ?, ?, ?, 0)",
-    [uuid, email || null, phone || null, type || "single", verifyCode],
+db.query(
+  "INSERT INTO guests (uuid, name, email, phone, type, verify_code, checked_in) VALUES (?, ?, ?, ?, ?, ?, 0)",
+  [uuid, name, email || null, phone || null, type || "single", verifyCode],
+
     (err) => {
       if (err) {
         console.error("❌ Error inserting guest:", err.message);
