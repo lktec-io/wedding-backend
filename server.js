@@ -54,12 +54,11 @@ app.post("/api/guest", (req, res) => {
   if (!name) return res.status(400).json({ error: "Guest name is required" });
 
   const uuid = uuidv4();
-  const verifyCode = hasSmartphone ? null : generateCode(6); // kwa wasiokuwa na smartphone
+  const verifyCode = hasSmartphone ? null : generateCode(6);
 
-db.query(
-  "INSERT INTO guests (uuid, name, email, phone, type, verify_code, checked_in) VALUES (?, ?, ?, ?, ?, ?, 0)",
-  [uuid, name, email || null, phone || null, type || "single", verifyCode],
-
+  db.query(
+    "INSERT INTO guests (uuid, name, email, phone, type, verify_code, checked_in) VALUES (?, ?, ?, ?, ?, ?, 0)",
+    [uuid, name, email || null, phone || null, type || "single", verifyCode],
     (err) => {
       if (err) {
         console.error("❌ Error inserting guest:", err.message);
