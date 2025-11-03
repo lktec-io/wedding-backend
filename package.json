@@ -1,55 +1,28 @@
 {
   "name": "wedding-backend",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "type": "module",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "mysql2": "^3.15.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-scripts": "5.0.1",
-    "uuid": "^13.0.0",
-    "web-vitals": "^2.1.4"
-  },
+  "version": "1.0.0",
+  "description": "Backend API for wedding invitation system",
+  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "mysql2": "^3.9.7",
+    "uuid": "^9.0.1"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "engines": {
+    "node": ">=18"
   },
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
-  "main": "index.js",
-  "keywords": [],
-  "author": "",
+  "author": "Leonard Kusekwa",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lktec-io/wedding-backend.git"
+    "url": "https://github.com/lktec-io/wedding-backend.git"
   },
   "bugs": {
     "url": "https://github.com/lktec-io/wedding-backend/issues"
