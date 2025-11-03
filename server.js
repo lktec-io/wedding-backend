@@ -105,7 +105,7 @@ app.post("/api/verify", async (req, res) => {
 
     if (!results || results.length === 0) {
       console.log("⚠️ Code not found:", code);
-      return res.status(404).json({ message: "Code not found or invalid" });
+      return res.status(404).json({ message: "Code already checked" });
     }
 
     const guest = results[0];
