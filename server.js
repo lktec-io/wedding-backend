@@ -94,39 +94,79 @@ app.post("/api/guest", async (req, res) => {
   }
 });
 
-// ✅ API: Verify guest (accepts UUID OR verify_code). Marks checked_in and returns guest info.
-app.post("/api/verify", async (req, res) => {
-  const { code } = req.body;
-  if (!code) return res.status(400).json({ error: "Verification code required" });
+// 🔍 SEARCH guests by NAME or CODE (returns LIST)
+app.post("/api/guest/search", async (req, res) => {
+  const { query } = req.body;
+  if (!query) return res.status(400).json({ message: "Query required" });
 
   try {
-    const sql = "SELECT * FROM guests WHERE uuid = ? OR verify_code = ?";
-    const results = await queryAsync(sql, [code, code]);
+    const results = await queryAsync(
+      `
+      SELECT 
+        id,
+        uuid,
+        name,
+        type,
+        verify_code AS code,
+        checked_in
+      FROM guests
+      WHERE verify_code = ?
+         OR uuid = ?
+         OR name LIKE ?
+      ORDER BY name ASC
+      `,
+      [query, query, `%${query}%`]
+    );
 
-    if (!results || results.length === 0) {
-      console.log("⚠️ Code not found:", code);
-      return res.status(404).json({ message: "Code already checked" });
+    if (!results.length) {
+      return res.status(404).json({ message: "Mgeni hajapatikana" });
+    }
+
+    // 🔥 RUDISHA LIST
+    res.json({ guests: results });
+  } catch (err) {
+    console.error("❌ search error:", err);
+    res.status(500).json({ message: "Database error" });
+  }
+});
+
+
+
+
+
+// ✅ CONFIRM CHECK-IN (manual)
+app.post("/api/checkin", async (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.status(400).json({ message: "Code required" });
+
+  try {
+    const results = await queryAsync(
+      "SELECT id, checked_in FROM guests WHERE verify_code = ? OR uuid = ?",
+      [code, code]
+    );
+
+    if (!results.length) {
+      return res.status(404).json({ message: "Mgeni hajapatikana" });
     }
 
     const guest = results[0];
 
     if (guest.checked_in) {
-      // already checked in
-      return res.status(409).json({ message: "Guest already checked in", guest });
+      return res.status(409).json({ message: "Mgeni tayari ame-check-in" });
     }
 
-    // mark as checked in
-    await queryAsync("UPDATE guests SET checked_in = 1, checkin_time = NOW() WHERE id = ?", [guest.id]);
+    await queryAsync(
+      "UPDATE guests SET checked_in = 1, checkin_time = NOW() WHERE id = ?",
+      [guest.id]
+    );
 
-    console.log(`✅ ${guest.name} verified and checked-in`);
-    // Return updated guest (fetch fresh)
-    const updated = await queryAsync("SELECT * FROM guests WHERE id = ?", [guest.id]);
-    res.status(200).json({ message: "Guest verified and checked-in", guest: updated[0] });
+    res.json({ success: true });
   } catch (err) {
-    console.error("❌ Verification error:", err);
-    res.status(500).json({ error: "Database error" });
+    console.error("❌ checkin error:", err);
+    res.status(500).json({ message: "Database error" });
   }
 });
+
 
 // Optional: endpoint to bulk-assign verify_codes to guests missing them (admin use)
 app.post("/api/admin/assign-codes", async (req, res) => {
