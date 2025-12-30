@@ -132,6 +132,69 @@ app.post("/api/guest/search", async (req, res) => {
 
 
 
+// 📸 VERIFY BY QR CODE (UUID)
+app.post("/api/verify", async (req, res) => {
+  const { qr_code } = req.body;
+  if (!qr_code) {
+    return res.status(400).json({
+      status: "error",
+      message: "QR code inahitajika",
+    });
+  }
+
+  try {
+    const results = await queryAsync(
+      `
+      SELECT 
+        id,
+        uuid,
+        name,
+        type,
+        checked_in
+      FROM guests
+      WHERE uuid = ?
+      `,
+      [qr_code]
+    );
+
+    if (!results.length) {
+      return res.status(404).json({
+        status: "error",
+        message: "❌ Mgeni hajapatikana",
+      });
+    }
+
+    const guest = results[0];
+
+    if (guest.checked_in) {
+      return res.status(409).json({
+        status: "blocked",
+        name: guest.name,
+        message: "⛔ Tayari ame-check-in",
+      });
+    }
+
+    // ✅ Mark check-in
+    await queryAsync(
+      "UPDATE guests SET checked_in = 1, checkin_time = NOW() WHERE id = ?",
+      [guest.id]
+    );
+    return res.json({
+      status: "success",
+      name: guest.name,
+      message: "✅ Check-in imefanikiwa",
+    });
+  } catch (err) {
+    console.error("❌ QR verify error:", err);
+    res.status(500).json({
+      status: "error",
+      message: "Tatizo la server",
+    });
+  }
+});
+
+
+
 
 
 // ✅ CONFIRM CHECK-IN (manual)
